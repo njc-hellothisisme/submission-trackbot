@@ -63,9 +63,14 @@ async def fetch_cf_submission(message):
         f"""New Codeforces submission recorded with ID {fetched_submission.id}
 Problem is {fetched_submission.problem.contest_id}{fetched_submission.problem.index}
 Verdict is {possible_cf_verdict.get(fetched_submission.verdict,"FAILED")}
-Submission can be viewed [here](codeforces.com/contest/{fetched_submission.problem.contest_id}/submission/{fetched_submission.id}).
 """
     )
+    embed_link = discord.Embed(
+        title="View submission here",
+        color=discord.Color.blue(), # Or use a hex code like 0x3498db
+        url=f"https://codeforces.com/contest/{fetched_submission.problem.contest_id}/submission/{fetched_submission.id}"  # Turns the title into a clickable hyperlink
+    )
+    await message.channel.send(embed=embed_link)
     last_cf_submission = fetched_submission
 
 @tasks.loop(seconds=20.0)
