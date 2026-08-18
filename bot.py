@@ -18,14 +18,14 @@ cf_api = codeforces_api.CodeforcesApi()
 last_submission: codeforces_api.Submission = None
 
 possible_verdict ={
-    "OK": "AC",
-    "PARTIAL": "PC",
-    "COMPILATION_ERROR": "CE",
-    "RUNTIME_ERROR": "RTE",
-    "TIME_LIMIT_EXCEEDED": "TLE",
-    "MEMORY_LIMIT_EXCEEDED": "MLE",
-    "IDLENESS_LIMIT_EXCEEDED": "Interactive TLE",
-    "WRONG_ANSWER": "WA"
+    "OK": "ACCEPTED",
+    "PARTIAL": "PARTIAL CREDIT",
+    "COMPILATION_ERROR": "COMPILE ERROR",
+    "RUNTIME_ERROR": "RUNTIME ERROR",
+    "TIME_LIMIT_EXCEEDED": "TIME LIMIT EXCEEDED",
+    "MEMORY_LIMIT_EXCEEDED": "MEMORY LIMIT EXCEEDED",
+    "IDLENESS_LIMIT_EXCEEDED": "IDLENESS LIMIT EXCEEDED",
+    "WRONG_ANSWER": "WRONG ANSWER"
 }
 
 @tasks.loop(seconds = 10.0)
@@ -42,7 +42,7 @@ async def fetch_submission(message):
         f"""New submission recorded with ID {fetched_submission.id}
 Problem is {fetched_submission.problem.contest_id}{fetched_submission.problem.index}
 Verdict is {possible_verdict.get(fetched_submission.verdict,"FAILED")}
-Submission can be viewed at codeforces.com/contest/{fetched_submission.problem.contest_id}/submission/{fetched_submission.id}.
+Submission can be viewed [here](codeforces.com/contest/{fetched_submission.problem.contest_id}/submission/{fetched_submission.id}).
 """
     )
     last_submission = fetched_submission
