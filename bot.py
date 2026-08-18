@@ -18,7 +18,7 @@ cf_api = codeforces_api.CodeforcesApi()
 last_cf_submission = None
 last_ac_submission = None
 
-possible_verdict ={
+possible_cf_verdict ={
     "OK": "ACCEPTED",
     "PARTIAL": "PARTIAL CREDIT",
     "COMPILATION_ERROR": "COMPILE ERROR",
@@ -28,9 +28,25 @@ possible_verdict ={
     "IDLENESS_LIMIT_EXCEEDED": "IDLENESS LIMIT EXCEEDED",
     "WRONG_ANSWER": "WRONG ANSWER"
 }
+possible_ac_verdict = {
+    "AC": "ACCEPTED",
+    "CE": "COMPILE ERROR",
+    "RE": "RUNTIME ERROR",
+    "TLE": "TIME LIMIT EXCEEDED",
+    "MLE": "MEMORY LIMIT EXCEEDED",
+    "OLE": "OUTPUT LIMIT EXCEEDED",
+    "WA": "WRONG ANSWER"
+}
 
 def return_latest_cf_submission():
     return cf_api.user_status("hellothisisme",-1,1)[0]
+
+def prep_cf_submission():
+    last_cf_submission = return_latest_cf_submission()
+
+def prep_ac_submission():
+    #todo: decipher json bullshit
+    pass
 
 @tasks.loop(seconds = 20.0)
 async def fetch_cf_submission(message):
@@ -43,19 +59,24 @@ async def fetch_cf_submission(message):
         return
     print("New submission registered!")
     await message.channel.send(
-        f"""New submission recorded with ID {fetched_submission.id}
+        f"""New Codeforces submission recorded with ID {fetched_submission.id}
 Problem is {fetched_submission.problem.contest_id}{fetched_submission.problem.index}
-Verdict is {possible_verdict.get(fetched_submission.verdict,"FAILED")}
+Verdict is {possible_cf_verdict.get(fetched_submission.verdict,"FAILED")}
 Submission can be viewed [here](codeforces.com/contest/{fetched_submission.problem.contest_id}/submission/{fetched_submission.id}).
 """
     )
     last_cf_submission = fetched_submission
 
+@tasks.loop(seconds=20.0)
+async def fetch_ac_submission(message):
+    #todo: actually implement this
+    pass
+
 @client.event
 async def on_ready():
     print(f'Bot is ready!')
     global last_cf_submission 
-    last_cf_submission = return_latest_cf_submission()
+    
 
 @client.event
 async def on_message(message):
