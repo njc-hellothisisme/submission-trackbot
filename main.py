@@ -76,8 +76,7 @@ async def fetch_ac_submission(message):
 @client.event
 async def on_ready():
     print(f'Bot is ready!')
-    global last_cf_submission 
-    
+    prep_cf_submission()
 
 @client.event
 async def on_message(message):
