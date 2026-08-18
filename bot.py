@@ -15,7 +15,8 @@ client = discord.Client(intents=intents)
 # sets up cf api access
 cf_api = codeforces_api.CodeforcesApi()
 # sets up the last submission that is registered; default to first submission registered
-last_submission: codeforces_api.Submission = None
+last_cf_submission = None
+last_ac_submission = None
 
 possible_verdict ={
     "OK": "ACCEPTED",
@@ -28,12 +29,15 @@ possible_verdict ={
     "WRONG_ANSWER": "WRONG ANSWER"
 }
 
-@tasks.loop(seconds = 10.0)
-async def fetch_submission(message):
-    global last_submission
+def return_latest_cf_submission():
+    return cf_api.user_status("hellothisisme",-1,1)[0]
+
+@tasks.loop(seconds = 20.0)
+async def fetch_cf_submission(message):
+    global last_cf_submission
     # fetch a submission and broadcasts it if it is a new submission
-    fetched_submission = cf_api.user_status("hellothisisme",-1,1)[0]
-    if fetched_submission.id == last_submission.id:
+    fetched_submission = return_latest_cf_submission()
+    if fetched_submission.id == last_cf_submission.id:
         return
     if fetched_submission.verdict in ["","TESTING", "SUBMITTED"]:
         return
@@ -45,13 +49,13 @@ Verdict is {possible_verdict.get(fetched_submission.verdict,"FAILED")}
 Submission can be viewed [here](codeforces.com/contest/{fetched_submission.problem.contest_id}/submission/{fetched_submission.id}).
 """
     )
-    last_submission = fetched_submission
+    last_cf_submission = fetched_submission
 
 @client.event
 async def on_ready():
     print(f'Bot is ready!')
-    global last_submission 
-    last_submission = cf_api.user_status("hellothisisme",-1,1)[0]
+    global last_cf_submission 
+    last_cf_submission = return_latest_cf_submission()
 
 @client.event
 async def on_message(message):
@@ -62,5 +66,5 @@ async def on_message(message):
         await message.channel.send('Hello!')
     if message.content.startswith('$init'):
         await message.channel.send('Bot initialised, listening for new submissions...')
-        fetch_submission.start(message)
+        fetch_cf_submission.start(message)
 client.run(token)
