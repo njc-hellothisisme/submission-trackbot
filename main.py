@@ -42,6 +42,7 @@ def return_latest_cf_submission():
     return cf_api.user_status("hellothisisme",-1,1)[0]
 
 def prep_cf_submission():
+    global last_cf_submission
     last_cf_submission = return_latest_cf_submission()
 
 def prep_ac_submission():
